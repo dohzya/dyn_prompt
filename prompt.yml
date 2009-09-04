@@ -1,0 +1,9 @@
+low:
+  PROMPT:  "$gt{}$br{ }$vm{}%# "
+  RPROMPT: ""
+medium:
+  PROMPT:  "%1~ $br{}$fl{} $vm{}%# "
+  RPROMPT: "[$rvm{}] %m %*"
+high:
+  PROMPT:  "%1~ $br{}$fl{} $vm{}%# "
+  RPROMPT: " %b%~%b) [$rvm{}] %m %*"

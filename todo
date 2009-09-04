@@ -1,0 +1,2 @@
+- filters possèdent des variables d'instances
+- filter.subs fait instance_eval des proc
