@@ -2,7 +2,7 @@ require 'yaml'
 
 module DynPrompt
   class Prompt
-    @@prompt_file = $src_path/'prompt.yml'
+    @@prompt_file = DYNPROMPT_HOME/'prompt.yml'
     @@default_verbosity = 'medium'
 
     def initialize(file=@@prompt_file)

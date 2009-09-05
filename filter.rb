@@ -72,6 +72,6 @@ module DynPrompt
   end # Filter
 end
 
-Dir["#$src_path/filters/*.rb"].each do |filter|
+Dir["#{DYNPROMPT_HOME}/filters/*.rb"].each do |filter|
   require filter
 end

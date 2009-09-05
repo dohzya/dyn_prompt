@@ -84,6 +84,6 @@ module DynPrompt
   end # Parser
 end # DynPrompt
 
-Dir["#$src_path/parsers/*.rb"].each do |parser|
+Dir["#{DYNPROMPT_HOME}/parsers/*.rb"].each do |parser|
   require parser
 end

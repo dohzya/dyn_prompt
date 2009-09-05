@@ -1,7 +1,7 @@
 module DynPrompt::Parser
   class MercurialParser < SCM
     def self.active?
-      ($path/'.hg').directory?
+      (PATH/'.hg').directory?
     end
     def parse_branch
         %x(hg branch 2> /dev/null).chomp
