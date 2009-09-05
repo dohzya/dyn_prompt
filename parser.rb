@@ -6,31 +6,31 @@ module DynPrompt
     def initialize(parser)
       @parser = parser
     end
-    # def method_missing(meth_name, *args, &bloc)
-    #   if @parser.respond_to? meth_name or @parser.respond_to? "parse_#{meth_name}"
-    #     @parser.send(meth_name, *args, &bloc)
-    #     meth = "def #{meth_name}(*args,&bloc) @parser.#{meth_name}(*args#{bloc ? ", &bloc" : ""}) end"
-    #     $stderr.puts "#{self.class}: #{meth}" if $DEBUG
-    #     self.class.module_eval(meth)
-    #   else
-    #     super
-    #   end
-    # end
   end # Env
   module Parser
+    # list of all parsers
     @@parsers = []
+
+    # get list of all active parsers
     def self.actives
       @@actives ||= @@parsers.select do |parser|
         parser.active?
       end
       @@actives
     end
+
+    # add a parser (order is preserved)
     def self.<<( parser )
       @@parsers.unshift(parser)
     end
 
     class Base
+      # environment of the parser
       attr_reader :env
+
+      # each child of this class will:
+      # - be saved in the @@parser variable
+      # - have a class Env
       def self.inherited(child)
         unless child.const_defined?('Env') && child.const_get('Env').name === "#{child.name}::Env"
           child.const_set('Env', Class.new(Env))
@@ -38,16 +38,10 @@ module DynPrompt
         $stderr.puts "add #{child.const_get('Env')}" if $DEBUG
         Parser << child
       end
-      # def method_missing(meth_name, *args, &bloc)
-      #   orig_name = "parse_#{meth_name}"
-      #   if respond_to? orig_name
-      #     send(orig_name, *args, &bloc)
-      #     var_name = meth_name.to_s.sub(/[?!]$/, '')
-      #     meth = "def #{meth_name}() @#{var_name} ||= #{orig_name} end"
-      #     $stderr.puts "#{self}: #{meth}" if $DEBUG
-      #     module_eval(meth)
-      #   end
-      # end
+
+      # for each new method:
+      # - generate getter method if the name begin with 'parse_'
+      # - generate getter method in the environment class
       def self.method_added(meth_name)
         if meth_name.to_s =~ /^parse_/
           new_name = meth_name.to_s.sub(/parse_/, '')
@@ -62,11 +56,15 @@ module DynPrompt
           env.module_eval(meth) if env
         end
       end
+
+      # get the environment (with tap comportment)
       def env(&bloc)
         @env ||= self.class.const_get('Env').new(self)
         bloc.call(@env) if bloc
         @env
       end
+
+      # if this parser active?
       def self.active?
         false
       end
@@ -84,6 +82,7 @@ module DynPrompt
   end # Parser
 end # DynPrompt
 
+# load all user defined parsers
 Dir["#{DYNPROMPT_HOME}/parsers/*.rb"].each do |parser|
   require parser
 end
