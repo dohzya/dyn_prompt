@@ -31,13 +31,15 @@ module DynPrompt
         end
       end
       def self.accept?(parser)
-        filter_name = self.name[/[^:]+$/].sub(/Filter$/,'')
-        parser_name = parser.name[/[^:]+$/].sub(/Parser$/,'')
-        filter_name == parser_name
+        self.name[/[^:]+$/].sub(/Filter$/,'') == parser.name[/[^:]+$/].sub(/Parser$/,'')
+      end
+      def self.sub(name, value=nil, &bloc)
+        value ||= bloc
+        raise "can't use a bloc with arity > 0'" if value.is_a?(Proc) && !value.arity.zero?
+        subs[name] = value
       end
       def self.subs(hash=nil, &bloc)
         subs = const_get('Subs')
-        subs.merge!(hash) if hash
         bloc.call(subs) if bloc
         subs
       end
@@ -53,10 +55,13 @@ module DynPrompt
             else
               value
             end
-          arity = repl.arity
           res.gsub(reg) do |match|
             match = match[/[{].*[}]/]
-            repl.call(*[env, match][0...arity])
+            if repl.arity.zero?
+              instance_exec(&repl)
+            else
+              repl.call(*[env, match][0...repl.arity])
+            end
           end
         end
       end

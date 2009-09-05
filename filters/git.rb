@@ -1,11 +1,11 @@
 class GitFilter < DynPrompt::Filter::Base
 
-  subs 'br' => :branch
-  subs 'df' => lambda {|env| env.diff? ? '*' : '' }
-  subs 'tg' => lambda {|env| env.tag ? "%B#{env.tag}%b " : '' }
-  subs 'fl' => :flags
+  sub 'br', :branch
+  sub 'df' do  env.diff? ? '*' : '' end
+  sub 'tg' do  env.tag ? "%B#{env.tag}%b " : '' end
+  sub 'fl', :flags
 
-  def branch
+  def branch(match)
     br = env.branch
     unless br.blank?
       br = "%B#{br}%b" if env.inside_work_tree?
