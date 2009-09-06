@@ -54,13 +54,12 @@ module DynPrompt
       # 
       # pattern[string,regexp] => the pattern to substitute
       # value:                 => the value [replaced by &bloc if nil]
+      #   [method]               => the method will be called
       #   [symbol]               => the method(value) will be called
-      #   [proc]                 => the proc will be called inside instance context
+      #   [proc]                 => the proc will be transformed in method
       #   [*]                    => the value will not be changed
-      # &bloc                  => [can't take parameters']
       def self.sub(pattern, value=nil, &bloc)
         value ||= bloc
-        raise "can't use a bloc with arity > 0'" if value.is_a?(Proc) && !value.arity.zero?
         subs[pattern] = value
       end
 
@@ -73,24 +72,30 @@ module DynPrompt
 
       # filter a string with all registered substitute variables
       def filter(str)
-        self.class.subs.inject(str) do |res, (ptn, value)|
-          reg   = /[$]#{ptn}[{][^}]*[}]/ unless ptn.is_a? Regexp
+        subs = self.class.subs
+        subs.inject(str) do |res, (ptn, value)|
+          reg   = ptn.is_a?(Regexp) ? ptn : /[$]#{ptn}[{]([^}]*)[}]/ 
           repl = 
             case value
+            when Method
+              value
             when Symbol
               method(value)
             when Proc
-              value
+              method_name = "__method_for_#{reg.inspect}"
+              self.class.module_eval do
+                define_method(method_name, value)
+              end
+              method(method_name)
             else
-              lambda{value}
+              lambda{|*_| value }
             end
+          subs.delete(ptn) if reg != ptn
+          subs[reg] = repl if reg != ptn || repl != value
+          arity = repl.arity < 0 ? -1 : repl.arity
           res.gsub(reg) do |match|
-            match = match[/[{].*[}]/]
-            if repl.arity.zero?
-              instance_exec(&repl)
-            else
-              repl.call(*[env, match][0...repl.arity])
-            end
+            match = match.match(reg)
+            repl.call(*[match][0...arity])
           end
         end
       end
