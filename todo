@@ -1,2 +1,11 @@
 - filters possèdent des variables d'instances
 - filter.subs fait instance_eval des proc
+
+         ╭────────╮      ╭──────╮      ╭─────╮
+system:  │ Prompt ├─────→│ Subs │  ╭──→│ Env │
+         ╰────────╯      ╰──┬───╯  │   ╰──┬──╯
+----------------------------│------│------│------------
+                            │ ╭────┴───╮  │ ╭────────╮
+user:                       ╰→│ Filter │  ╰→│ Parser │
+                              ╰────────╯    ╰────────╯
+
