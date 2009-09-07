@@ -130,7 +130,7 @@ module DynPrompt
     end # Base
 
     class DefaultFilter < Base
-      subs '[^\s]+' => ''
+      sub '[^\s]*', ''
     end # Default
 
   end # Filter
