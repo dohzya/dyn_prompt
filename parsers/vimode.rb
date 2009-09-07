@@ -5,7 +5,7 @@ class VimodeParser < DynPrompt::Parser::Base
 
   # parsers
 
-  def parse_vimode
+  def parse_mode
     ENV['VIMODE']
   end
 

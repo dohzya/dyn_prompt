@@ -1,9 +1,9 @@
 class VimodeFilter < DynPrompt::Filter::Base
 
-  sub 'vm', :vimode
+  sub 'vm', :mode
 
-  def vimode
-    case env.vimode
+  def mode
+    case env.mode
     when /insert/i
       '%Bi%b'
     else

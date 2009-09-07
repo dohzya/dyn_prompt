@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'json'
+
 require "#{File.dirname(__FILE__)}/dyn_prompt"
 
 def die(msg)
@@ -26,5 +28,26 @@ while arg = args.shift
   end
 end
 
-vars = DynPrompt.export(opts)
-puts vars.map {|name, value| %(export #{name}="#{value}")}.join("\n")
+vars = DynPrompt.export_env(opts)
+vars = vars.inject({}) do |new_vars, (name, value)|
+  if value.is_a? Hash
+    value.each do |n,v|
+      new_vars["prompt_#{name.downcase}_#{n}"] = v
+    end
+  else
+    new_vars[name] = value
+  end
+  new_vars
+end
+res = []
+vars.each do |name, value|
+  val =
+    case value
+    when nil,String
+      value
+    else
+      value.to_json
+    end
+  res << %(export #{name}="#{val}")
+end
+puts res.join("\n")

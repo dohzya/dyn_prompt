@@ -1,10 +1,10 @@
 class GitParser < DynPrompt::Parser::SCM
   @@msg_no_diff = /nothing to commit/
-    @@msg_changes = /nothing added to commit/
+  @@msg_changes = /nothing added to commit/
 
-    def self.active?
-      not %x(git rev-parse --git-dir 2> /dev/null).empty?
-    end
+  def self.active?
+    not %x(git rev-parse --git-dir 2> /dev/null).empty?
+  end
 
   # parsers
 
@@ -38,17 +38,17 @@ class GitParser < DynPrompt::Parser::SCM
   end
   def parse_head
     refs = %x(git show-ref --head 2> /dev/null)
-    if refs.respond_to? :lines
-      refs.lines.first.sub( / .*$/, '' )
+    if refs
+      refs.lines.first.sub( / .*\n$/, '' )
     else
       ''
     end
   end
-  def parse_inside_scm_dir?
-    %x(git rev-parse --is-inside-git-dir 2> /dev/null) =~ /true/
+  def parse_inside_git_dir?
+    %x(git rev-parse --is-inside-git-dir 2> /dev/null) === /true/
   end
   def parse_inside_work_tree?
-    %x(git rev-parse --is-inside-work-tree 2> /dev/null) =~ /true/
+    %x(git rev-parse --is-inside-work-tree 2> /dev/null) === /true/
   end
 
   # end of parsers

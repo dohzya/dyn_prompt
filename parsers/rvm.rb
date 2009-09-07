@@ -5,7 +5,7 @@ class RVMParser < DynPrompt::Parser::SCM
 
   # parsers
 
-  def parse_rvm_version
+  def parse_version
     ENV['rvm_prompt']
   end
 

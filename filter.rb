@@ -7,7 +7,7 @@ module DynPrompt
     def self.filters
       actives.collect do |filter, parser|
         filter = filter.new
-        filter.parser = parser.new
+        filter.parser = parser.new.env
         filter
       end
     end
@@ -122,6 +122,10 @@ module DynPrompt
       # the parser environment
       def env
         @parser
+      end
+
+      def name
+        self.class.name.sub(/Filter$/,'')
       end
     end # Base
 

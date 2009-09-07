@@ -1,10 +1,48 @@
 require 'ostruct'
 
 module DynPrompt
+  module EnvMod
+    def parse(var, value)
+      @parse ||= {}
+      @parse[var] = value
+    end
+    def [](var)
+      vars[var]
+    end
+    def []=(var, value)
+      vars[var] = value
+    end
+    def vars
+      @vars ||= {}
+    end
+  end
   class Env
     attr_reader :parser
     def initialize(parser)
       @parser = parser
+      @vars = {}
+    end
+    def [](var)
+      unless @vars[var]
+        val = self.class[var]
+        value = 
+          case val
+          when Symbol
+            @parser.method(val)
+          when Proc
+            val
+          else
+            lambda { val }
+          end
+        @vars[var] = @parser.instance_eval(&value)
+      end
+      @vars[var]
+    end
+    def vars
+      self.class.vars.keys.inject({}) do |res, var|
+        res[var] = self[var]
+        res
+      end
     end
   end # Env
   module Parser
@@ -32,8 +70,13 @@ module DynPrompt
       # - be saved in the @@parser variable
       # - have a class Env
       def self.inherited(child)
-        unless child.const_defined?('Env') && child.const_get('Env').name === "#{child.name}::Env"
-          child.const_set('Env', Class.new(Env))
+        if not child.const_defined?('Env') && child.const_get('Env').name === "#{child.name}::Env"
+          env = child.const_set('Env', Class.new(Env))
+        else
+          env = child.const_get('Env')
+        end
+        unless env.ancestors.include? EnvMod
+          env.extend(EnvMod)
         end
         $stderr.puts "add #{child.const_get('Env')}" if $DEBUG
         Parser << child
@@ -43,25 +86,32 @@ module DynPrompt
       # - generate getter method if the name begin with 'parse_'
       # - generate getter method in the environment class
       def self.method_added(meth_name)
+        return unless env # self == Base
         if meth_name.to_s =~ /^parse_/
           new_name = meth_name.to_s.sub(/parse_/, '')
           var_name = new_name.to_s.sub(/[?!]$/, '')
           meth = "def #{new_name}() @#{var_name} ||= #{meth_name} end"
           $stderr.puts "#{self}: #{meth}" if $DEBUG
           module_eval(meth)
+          parser_for(var_name, meth_name)
         else
           meth = "def #{meth_name}(*args, &bloc) @parser.#{meth_name}(*args, &bloc) end"
-          env = const_defined?('Env') ? const_get('Env') : nil
           $stderr.puts "#{env}: #{meth}" if $DEBUG
-          env.module_eval(meth) if env
+          env.module_eval(meth)
         end
       end
 
-      # get the environment (with tap comportment)
-      def env(&bloc)
+      def self.parser_for(name, meth=nil, &bloc)
+        env[name] = meth || bloc
+      end
+
+      def self.env
+        const_get('Env') if const_defined?('Env')
+      end
+
+      # get the environment
+      def env
         @env ||= self.class.const_get('Env').new(self)
-        bloc.call(@env) if bloc
-        @env
       end
 
       # if this parser active?

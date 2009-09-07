@@ -9,7 +9,7 @@ class GitFilter < DynPrompt::Filter::Base
     br = env.branch
     unless br.blank?
       br = "%B#{br}%b" if env.inside_work_tree?
-      br = "(#{br})" if env.inside_scm_dir?
+      br = "(#{br})" if env.inside_git_dir?
       br
     end
     br
