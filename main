@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'json'
+begin
+ require 'json' 
+rescue LoadError => e
+  no_json=true
+end
 
 require "#{File.dirname(__FILE__)}/dyn_prompt"
 
@@ -46,7 +50,7 @@ vars.each do |name, value|
     when nil,String
       value
     else
-      value.to_json
+      no_json ? value : value.to_json
     end
   res << %(export #{name}="#{val}")
 end
