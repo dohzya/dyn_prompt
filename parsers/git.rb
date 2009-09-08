@@ -45,10 +45,10 @@ class GitParser < DynPrompt::Parser::SCM
     end
   end
   def parse_inside_git_dir?
-    %x(git rev-parse --is-inside-git-dir 2> /dev/null) === /true/
+    !!%x(git rev-parse --is-inside-git-dir 2> /dev/null).match(/true/)
   end
   def parse_inside_work_tree?
-    %x(git rev-parse --is-inside-work-tree 2> /dev/null) === /true/
+    !!%x(git rev-parse --is-inside-work-tree 2> /dev/null).match(/true/)
   end
 
   # end of parsers
