@@ -7,10 +7,12 @@ module DynPrompt
       @parse[var] = value
     end
     def [](var)
-      vars[var]
+      vars[var.to_s]
     end
     def []=(var, value)
-      vars[var] = value
+      vars[var.to_s] = value
+      meth = %(def #{var}() self["#{var}"] end)
+      module_eval(meth)
     end
     def vars
       @vars ||= {}
@@ -23,6 +25,7 @@ module DynPrompt
       @vars = {}
     end
     def [](var)
+      var = var.to_s
       unless @vars[var]
         val = self.class[var]
         value = 
