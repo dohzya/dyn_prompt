@@ -37,12 +37,12 @@ class GitParser < DynPrompt::Parser::SCM
     %x(git show-ref --tags)
   end
   def parse_head
-    refs = %x(git show-ref --head 2> /dev/null)
-    if refs
-      refs.sub( / .*\n$.*\n?/, '' )
-    else
-      ''
+    refs = %x(git show-ref --head 2> /dev/null).each_line do |line|
+      if line.match(/HEAD/)
+        return line.sub( / .*\n$/, '' )
+      end
     end
+    nil
   end
   def parse_inside_git_dir?
     !!%x(git rev-parse --is-inside-git-dir 2> /dev/null).match(/true/)
