@@ -32,6 +32,27 @@ while arg = args.shift
   end
 end
 
+def to_json(str, use_gem)
+  case str
+  when nil,String
+    str
+  else
+    if use_gem
+      str.to_json
+    else
+      case str
+      when Array
+        "[#{str.map{|e|to_json(e, use_gem).join(', ')}}]"
+      when Hash
+        "{#{str.map{|k,v| "#{to_json(k, use_gem)}:#{to_json(v, use_gem)}"}.join(', ')}}"
+      else
+        str
+      end
+    end
+  end
+
+end
+
 vars = DynPrompt.export_env(opts)
 vars = vars.inject({}) do |new_vars, (name, value)|
   if value.is_a? Hash
@@ -45,13 +66,6 @@ vars = vars.inject({}) do |new_vars, (name, value)|
 end
 res = []
 vars.each do |name, value|
-  val =
-    case value
-    when nil,String
-      value
-    else
-      no_json ? value : value.to_json
-    end
-  res << %(export #{name}="#{val}")
+  res << %(export #{name}="#{to_json(value, !no_json)}")
 end
 puts res.join("\n")

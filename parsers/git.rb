@@ -28,7 +28,7 @@ class GitParser < DynPrompt::Parser::SCM
   end
 
   def parse_bare?
-    %x(git rev-parse --is-bare-repository 2> /dev/null) =~ /true/
+    !!%x(git rev-parse --is-bare-repository 2> /dev/null).match(/true/)
   end
   def diff?
     status[:diff]
