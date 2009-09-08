@@ -73,31 +73,50 @@ module DynPrompt
       # filter a string with all registered substitute variables
       def filter(str)
         subs = self.class.subs
-        subs.inject(str) do |res, (ptn, value)|
-          reg   = ptn.is_a?(Regexp) ? ptn : /[$]#{ptn}[{]([^}]*)[}]/ 
-          repl = 
+        changes = []
+        result = subs.inject(str) do |res, (ptn, (value, *type))|
+          if type.empty?
+            old_ptn, old_value = ptn, value
+            subs.delete(ptn)
+            case ptn
+            when Regexp
+              ptn, type = ptn, :user
+            else
+              ptn, type = /[$](?:[{]([^}]*)[}])?#{ptn}[(]([^)]*)[)](?:[{]([^}]*)[}])?/, :auto
+            end
             case value
             when Method
-              value
+              # do nothing
             when Symbol
-              method(value)
+              value = method(value)
             when Proc
-              method_name = "__method_for_#{reg.inspect}"
+              method_name = "__method_for_#{ptn.inspect}"
               self.class.module_eval do
                 define_method(method_name, value)
               end
-              method(method_name)
+              value = method(method_name)
             else
-              lambda{|*_| value }
+              value = lambda{|*_| old_value }
             end
-          subs.delete(ptn) if reg != ptn
-          subs[reg] = repl if reg != ptn || repl != value
-          arity = repl.arity < 0 ? -1 : repl.arity
-          res.gsub(reg) do |match|
-            match = match.match(reg)
-            repl.call(*[match][0...arity])
+            changes << [old_ptn, ptn, value, type]
+          else
+            type = type.first
+          end
+          arity = value.arity < 0 ? -1 : value.arity
+          res.gsub(ptn) do |match|
+            match = match.match(ptn)
+            if type == :auto
+              "%s%s%s" % [match[1], value.call(*[match[2]][0...arity]), match[3]]
+            else
+              value.call(*[match][0...arity])
+            end
           end
         end
+        changes.each do |(old_ptn, ptn, value, type)|
+          subs.delete(old_ptn)
+          subs[ptn] = [value, type]
+        end
+        result
       end
 
       # the parser environment

@@ -1,7 +1,7 @@
 class GitFilter < DynPrompt::Filter::Base
 
   sub 'br', :branch
-  sub 'df' do |match| env.diff? ? match[1] : '' end
+  sub 'df' do |match| env.diff? ? match[2] : '' end
   sub 'tg' do env.tag ? "%B#{env.tag}%b " : '' end
   sub 'fl', :flags
 
