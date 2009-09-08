@@ -39,7 +39,7 @@ class GitParser < DynPrompt::Parser::SCM
   def parse_head
     refs = %x(git show-ref --head 2> /dev/null)
     if refs
-      refs.lines.first.sub( / .*\n$/, '' )
+      refs.sub( / .*\n$.*\n?/, '' )
     else
       ''
     end
