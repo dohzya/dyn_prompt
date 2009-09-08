@@ -28,13 +28,13 @@ module DynPrompt
         value = 
           case val
           when Symbol
-            @parser.method(val)
+            @parser.send(val)
           when Proc
-            val
+            @parser.instance_eval(&val)
           else
-            lambda { val }
+            val
           end
-        @vars[var] = @parser.instance_eval(&value)
+        @vars[var] = value
       end
       @vars[var]
     end
