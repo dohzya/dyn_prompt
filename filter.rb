@@ -110,10 +110,10 @@ module DynPrompt
           arity = value.arity < 0 ? -1 : value.arity
           res.gsub(ptn) do |match|
             match = match.match(ptn)
-            if type == :auto
+            if type == :auto && [0,1].include?(arity)
               "%s%s%s" % [match[1], value.call(*[match[2]][0...arity]), match[3]]
             else
-              value.call(*[match][0...arity])
+              value.call(*match[0...arity])
             end
           end
         end
@@ -126,7 +126,7 @@ module DynPrompt
     end # Base
 
     class DefaultFilter < Base
-      sub '[^\s]*', ''
+      sub '[^\s]*' do |m1, m2, m3| '' end
     end # Default
 
   end # Filter

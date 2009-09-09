@@ -1,7 +1,7 @@
 class GitFilter < DynPrompt::Filter::Base
 
   sub 'nm', :name
-  sub 'df' do @diff ? match[2] : nil end
+  sub 'df' do |m| @diff ? m : nil end
   sub 'tg' do @tag ? "%B#{@tag}%b" : nil end
   sub 'fl', :flags
   sub 'rb' do @rebasing ? ' - %BREBASING%b -' : '' end

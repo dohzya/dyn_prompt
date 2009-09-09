@@ -38,15 +38,15 @@ class GitParser < DynPrompt::Parser::SCM
   end
 
   def parse_rebasing?
-    File.exist?(git_dir/'rebase-apply')
+    File.exist?(dir/'rebase-apply')
   end
-  def parse_git_dir
+  def parse_dir
     Pathname.new(%x(git rev-parse --git-dir 2> /dev/null).sub(/\n/,''))
   end
   def parse_bare?
     !!%x(git rev-parse --is-bare-repository 2> /dev/null).match(/true/)
   end
-  def diff?
+  def parse_diff?
     status[:diff]
   end
   def parse_tags
