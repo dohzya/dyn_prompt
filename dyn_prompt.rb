@@ -65,6 +65,7 @@ module DynPrompt
 end # DynPrompt
 
 require DYNPROMPT_HOME/:options
+require DYNPROMPT_HOME/:helpers
 require DYNPROMPT_HOME/:parser
 require DYNPROMPT_HOME/:filter
 require DYNPROMPT_HOME/:prompt

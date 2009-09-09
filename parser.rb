@@ -66,6 +66,8 @@ module DynPrompt
     end
 
     class Base
+      include Helpers
+
       # environment of the parser
       attr_reader :env
 
