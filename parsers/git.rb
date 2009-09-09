@@ -22,9 +22,19 @@ class GitParser < DynPrompt::Parser::SCM
   end
 
   def parse_branch
-    branch = status[:branch] 
+    branch = status[:branch]
     %x(git branch).each_line {|line| branch = line.sub(/[*]\s*([^\s]*)\s*/,'\1') if /^[*]/ === line} unless branch
+    branch = nil if branch == "(nobranch)\n"
     branch
+  end
+
+  def parse_names
+    refs = %x(git show-ref --head --dereference 2> /dev/null).split("\n")
+    refs = refs.select do |r|
+      h,n = r.split
+      (h == head) && !(n =~ /HEAD/)
+    end
+    refs.map{|s| s.sub(/[^ ]* /,'')}
   end
 
   def parse_bare?

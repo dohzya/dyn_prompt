@@ -5,13 +5,24 @@ class GitFilter < DynPrompt::Filter::Base
   sub 'tg' do @tag ? "%B#{@tag}%b" : nil end
   sub 'fl', :flags
 
+  def names
+    @names.map {|n| n.sub(/refs\/((remotes\/)|(heads\/))/,'') }
+  end
+
+  def other_names
+    names.select {|n| n != @branch }
+  end
+
   def name
     br = @branch
-    unless br.blank?
+    if br
       br = "%B#{br}%b" if @inside_work_tree
-      br = "(#{br})" if @inside_git_dir
-      br = "#{br}(#{tag})" if @tag
+      br = "(#{br})" unless @branch
+    else
+      br = ''
     end
+    br << "(#{other_names.join(',')})" unless other_names.blank?
+    br << "(t:#{tag})" if @tag
     br
   end
 
