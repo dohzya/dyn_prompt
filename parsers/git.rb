@@ -37,6 +37,12 @@ class GitParser < DynPrompt::Parser::SCM
     refs.map{|s| s.sub(/[^ ]* /,'')}
   end
 
+  def parse_rebasing?
+    File.exist?(git_dir/'rebase-apply')
+  end
+  def parse_git_dir
+    Pathname.new(%x(git rev-parse --git-dir 2> /dev/null).sub(/\n/,''))
+  end
   def parse_bare?
     !!%x(git rev-parse --is-bare-repository 2> /dev/null).match(/true/)
   end

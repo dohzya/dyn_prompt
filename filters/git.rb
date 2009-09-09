@@ -4,6 +4,7 @@ class GitFilter < DynPrompt::Filter::Base
   sub 'df' do @diff ? match[2] : nil end
   sub 'tg' do @tag ? "%B#{@tag}%b" : nil end
   sub 'fl', :flags
+  sub 'rb' do @rebasing ? ' - %BREBASING%b -' : '' end
 
   def names
     @names.map {|n| n.sub(/refs\/((remotes\/)|(heads\/))/,'') }

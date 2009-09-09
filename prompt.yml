@@ -1,9 +1,9 @@
 low:
-  PROMPT:  "$df(%B*%b){ }$nm(){ }$vm()%# "
+  PROMPT:  "$df(%B*%b){ }$nm()$rb(){ }$vm()%# "
   RPROMPT: ""
 medium:
-  PROMPT:  "%1~${ }nm()$fl() $vm()%# "
+  PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
   RPROMPT: "[$rvm()] %m %*"
 high:
-  PROMPT:  "%1~${ }nm()$fl() $vm()%# "
+  PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
   RPROMPT: " %B%~%b) [$rvm()] %m %*"
