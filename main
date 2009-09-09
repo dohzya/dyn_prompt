@@ -3,7 +3,6 @@
 begin
  require 'json' 
 rescue LoadError => e
-  no_json=true
 end
 
 require "#{File.dirname(__FILE__)}/dyn_prompt"
@@ -27,45 +26,12 @@ while arg = args.shift
   case arg
   when '-h','--help'
     print_usage
+  when /-d|--dir/
+    opts[:dir] = arg =~ /=/ ? arg.sub(/\s*=\s*/,'') : args.shift
   when /^-/
     die("unknown argument: #{arg}")
   end
 end
 
-def to_json(str, use_gem)
-  case str
-  when nil,String
-    str
-  else
-    if use_gem
-      str.to_json
-    else
-      case str
-      when Array
-        "[#{str.map{|e|to_json(e, use_gem).join(', ')}}]"
-      when Hash
-        "{#{str.map{|k,v| "#{to_json(k, use_gem)}:#{to_json(v, use_gem)}"}.join(', ')}}"
-      else
-        str
-      end
-    end
-  end
-
-end
-
-vars = DynPrompt.export_env(opts)
-vars = vars.inject({}) do |new_vars, (name, value)|
-  if value.is_a? Hash
-    value.each do |n,v|
-      new_vars["prompt_#{name.downcase}_#{n}"] = v
-    end
-  else
-    new_vars[name] = value
-  end
-  new_vars
-end
-res = []
-vars.each do |name, value|
-  res << %(export #{name}="#{to_json(value, !no_json)}")
-end
-puts res.join("\n")
+env = DynPrompt::Env.new(opts)
+puts env.to_shell

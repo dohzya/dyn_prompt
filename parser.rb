@@ -1,54 +1,54 @@
 require 'ostruct'
 
 module DynPrompt
-  module EnvMod
-    def parse(var, value)
-      @parse ||= {}
-      @parse[var] = value
-    end
-    def [](var)
-      vars[var.to_s]
-    end
-    def []=(var, value)
-      vars[var.to_s] = value
-      meth = %(def #{var}() self["#{var}"] end)
-      module_eval(meth)
-    end
-    def vars
-      @vars ||= {}
-    end
-  end
-  class Env
-    attr_reader :parser
-    def initialize(parser)
-      @parser = parser
-      @vars = {}
-    end
-    def [](var)
-      var = var.to_s
-      unless @vars[var]
-        val = self.class[var]
-        value = 
-          case val
-          when Symbol
-            @parser.send(val)
-          when Proc
-            @parser.instance_eval(&val)
-          else
-            val
-          end
-        @vars[var] = value
-      end
-      @vars[var]
-    end
-    def vars
-      self.class.vars.keys.inject({}) do |res, var|
-        res[var] = self[var]
-        res
-      end
-    end
-  end # Env
   module Parser
+    module EnvMod
+      def parse(var, value)
+        @parse ||= {}
+        @parse[var] = value
+      end
+      def [](var)
+        vars[var.to_s]
+      end
+      def []=(var, value)
+        vars[var.to_s] = value
+        meth = %(def #{var}() self["#{var}"] end)
+        module_eval(meth)
+      end
+      def vars
+        @vars ||= {}
+      end
+    end
+    class Env
+      attr_reader :parser
+      def initialize(parser)
+        @parser = parser
+        @vars = {}
+      end
+      def [](var)
+        var = var.to_s
+        unless @vars[var]
+          val = self.class[var]
+          value =
+            case val
+            when Symbol
+              @parser.send(val)
+            when Proc
+              @parser.instance_eval(&val)
+            else
+              val
+            end
+          @vars[var] = value
+        end
+        @vars[var]
+      end
+      def vars
+        self.class.vars.keys.inject({}) do |res, var|
+          res[var] = self[var]
+          res
+        end
+      end
+    end # Env
     # list of all parsers
     @@parsers = []
 
