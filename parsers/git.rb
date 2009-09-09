@@ -24,7 +24,7 @@ class GitParser < DynPrompt::Parser::SCM
   def parse_branch
     branch = status[:branch]
     %x(git branch).each_line {|line| branch = line.sub(/[*]\s*([^\s]*)\s*/,'\1') if /^[*]/ === line} unless branch
-    branch = nil if branch == "(nobranch)\n"
+    branch = nil if branch =~ /[(]nobranch[)]/
     branch
   end
 
@@ -47,12 +47,10 @@ class GitParser < DynPrompt::Parser::SCM
     %x(git show-ref --tags)
   end
   def parse_head
-    refs = %x(git show-ref --head 2> /dev/null).each_line do |line|
-      if line.match(/HEAD/)
-        return line.sub( / .*\n$/, '' )
-      end
-    end
-    nil
+    %x(git rev-parse HEAD 2> /dev/null).sub(/\n/,'')
+  end
+  def parse_short_head
+    %x(git rev-parse --short HEAD 2> /dev/null).sub(/\n/,'')
   end
   def parse_inside_git_dir?
     !!%x(git rev-parse --is-inside-git-dir 2> /dev/null).match(/true/)

@@ -19,7 +19,7 @@ class GitFilter < DynPrompt::Filter::Base
       br = "%B#{br}%b" if @inside_work_tree
       br = "(#{br})" unless @branch
     else
-      br = ''
+      br = @short_head
     end
     br << "(#{other_names.join(',')})" unless other_names.blank?
     br << "(t:#{tag})" if @tag
