@@ -7,7 +7,10 @@ module DynPrompt
     def self.filters
       actives.collect do |filter, parser|
         filter = filter.new
-        filter.parser = parser.new.env
+        filter.env = parser.new.env
+        filter.env.vars.each do |name, value|
+          filter.instance_variable_set("@#{name}", value)
+        end
         filter
       end
     end
@@ -31,9 +34,7 @@ module DynPrompt
     end
 
     class Base
-      # the parser associated
-      attr_accessor :parser
-
+      attr_accessor :env
       # each child of this class:
       # - will be saved in the @@filters vars
       # - will have a Subs module containing all substitute variables
@@ -117,11 +118,6 @@ module DynPrompt
           subs[ptn] = [value, type]
         end
         result
-      end
-
-      # the parser environment
-      def env
-        @parser
       end
 
       def name

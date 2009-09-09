@@ -1,22 +1,30 @@
 class GitFilter < DynPrompt::Filter::Base
 
   sub 'br', :branch
-  sub 'df' do |match| env.diff? ? match[2] : '' end
-  sub 'tg' do env.tag ? "%B#{env.tag}%b " : '' end
+  sub 'df', :diff
+  sub 'tg', :tag
   sub 'fl', :flags
 
-  def branch(match)
-    br = env.branch
+  def diff(arg='*')
+    @diff ? arg : nil
+  end
+
+  def tag
+    @tag ? "%B#{@tag}%b" : nil
+  end
+
+  def branch
+    br = @branch
     unless br.blank?
-      br = "%B#{br}%b" if env.inside_work_tree?
-      br = "(#{br})" if env.inside_git_dir?
+      br = "%B#{br}%b" if @inside_work_tree
+      br = "(#{br})" if @inside_git_dir
       br
     end
     br
   end
 
   def flags
-    st = env.status
+    st = @status
     if st[:commited] || st[:changes] || st[:untracked]
       "[#{st[:commited] ? 'a' : ''}#{st[:changes] ? 'm' : ''}#{st[:untracked] ? 'u' : ''}]"
     else
