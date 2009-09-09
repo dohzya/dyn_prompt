@@ -17,7 +17,7 @@ module DynPrompt
       Dir.chdir(dir) do
         vars.merge!(@prompt.generate)
         @filters.each do |filter|
-          vars.merge!(filter.name => filter.env.vars)
+          vars.merge!(filter.class.filter_name => filter.env.vars)
         end
       end
       vars

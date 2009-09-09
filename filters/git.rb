@@ -1,24 +1,16 @@
 class GitFilter < DynPrompt::Filter::Base
 
-  sub 'br', :branch
-  sub 'df', :diff
-  sub 'tg', :tag
+  sub 'nm', :name
+  sub 'df' do @diff ? match[2] : nil end
+  sub 'tg' do @tag ? "%B#{@tag}%b" : nil end
   sub 'fl', :flags
 
-  def diff(arg='*')
-    @diff ? arg : nil
-  end
-
-  def tag
-    @tag ? "%B#{@tag}%b" : nil
-  end
-
-  def branch
+  def name
     br = @branch
     unless br.blank?
       br = "%B#{br}%b" if @inside_work_tree
       br = "(#{br})" if @inside_git_dir
-      br
+      br = "#{br}(#{tag})" if @tag
     end
     br
   end

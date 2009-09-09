@@ -45,6 +45,10 @@ module DynPrompt
         end
       end
 
+      def self.filter_name
+        name.sub(/Filter$/,'')
+      end
+
       # by default a filter accept a parser with same prefix
       #   example: DefaultFilter accept DefaultParser
       def self.accept?(parser)
@@ -118,10 +122,6 @@ module DynPrompt
           subs[ptn] = [value, type]
         end
         result
-      end
-
-      def name
-        self.class.name.sub(/Filter$/,'')
       end
     end # Base
 
