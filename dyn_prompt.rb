@@ -41,8 +41,25 @@ module DynPrompt
       @vars.map{|name, value| %(export #{name}=#{value}) }.join("\n")
     end
     private
-    def json(v)
-      if v then v.respond_to?(:to_json) ? v.to_json : v.inspect else nil end
+    def json(value, first=true)
+      case value
+      when true
+        first ? '"true"' : value
+      when nil
+        first ? '""' : "null"
+      when false
+        first ? '""' : value
+      when String,Symbol
+        value.to_s.inspect
+      when Array
+        res = "[%s]" % value.map{|e| json(e,false)}.join(',')
+        first ? res.inspect : res
+      when Hash
+        res = "{%s}" % value.map{|k,v| "%s:%s" % [json(k,false),json(v,false)] }.join(',')
+        first ? res.inspect : res
+      else
+        value
+      end
     end
   end
 end # DynPrompt

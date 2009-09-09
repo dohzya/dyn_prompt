@@ -1,10 +1,5 @@
 #!/usr/bin/env ruby
 
-begin
- require 'json' 
-rescue LoadError => e
-end
-
 require "#{File.dirname(__FILE__)}/dyn_prompt"
 
 def die(msg)
