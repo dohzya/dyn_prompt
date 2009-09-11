@@ -33,6 +33,8 @@ module DynPrompt
         res.empty? ? nil : res
       when :one
         res.empty? ? nil : res.first
+      when Regexp
+        result === res.first
       else
         result === res
       end
