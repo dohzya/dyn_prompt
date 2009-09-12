@@ -13,10 +13,10 @@ module DynPrompt
     #   :select[hash,proc] => select what line to return
     #   :filter[hash,proc] => filter line 
     #   :test              => 
-    def sh(cmd, opts={})
-      result  = opts[:result] || :all
-      select  = opts[:select]
-      filter  = opts[:filter]
+    def sh(cmd, opts={}, &bloc)
+      result_type = opts[:result] || :all
+      select = opts[:select]
+      filter = opts[:filter]
       res = []
       IO.popen cmd do |f|
         f.each_line do |line|
@@ -26,18 +26,19 @@ module DynPrompt
           end
         end
       end
-      case result
-      when :result
-        $?.success?
-      when :all
-        res.empty? ? nil : res
-      when :one
-        res.empty? ? nil : res.first
-      when Regexp
-        result === res.first
-      else
-        result === res
-      end
+      result = case result_type
+               when :result_type
+                 $?.success?
+               when :all
+                 res.empty? ? nil : res
+               when :one
+                 res.empty? ? nil : res.first
+               when Regexp
+                 result_type === res.first
+               else
+                 result_type === res
+               end
+      bloc&&result ? bloc.call(result) : result
     end
   end
 end
