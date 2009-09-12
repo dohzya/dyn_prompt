@@ -22,26 +22,29 @@ class GitParser < DynPrompt::Parser::SCM
   end
 
   def parse_branch
-    branch = status[:branch]
-    sh("git branch").each {|line| branch = line.sub(/[*]\s*([^\s]*)\s*/,'\1') if /^[*]/ === line} unless branch
-    branch = nil if branch =~ /[(]nobranch[)]/
-    branch
+    status[:branch] || sh("git branch") do |branches|
+      branches.each do |line|
+        branch = line.sub(/[*]\s*([^\s]*)\s*/,'\1') if /^[*]/ === line
+      end
+      branch.match(/[(]nobranch[)]/) ? nil : branch
+    end
   end
 
   def parse_names
-    refs = sh("git show-ref --head --dereference 2> /dev/null")
-    refs = refs.select do |r|
-      h,n = r.split
-      (h == head) && !(n =~ /HEAD/)
+    sh("git show-ref --head --dereference 2> /dev/null") do |refs|
+      refs = refs.select do |r|
+        h,n = r.split
+        (h == head) && !(n =~ /HEAD/)
+      end
+      refs.map{|s| s.sub(/[^ ]* /,'')}
     end
-    refs.map{|s| s.sub(/[^ ]* /,'')}
   end
 
   def parse_rebasing?
     File.exist?(dir/'rebase-apply')
   end
   def parse_dir
-    Pathname.new(sh("git rev-parse --git-dir 2> /dev/null", :result => :one))
+    sh("git rev-parse --git-dir 2> /dev/null", :result => :one){|dir| Pathname.new(dir) }
   end
   def parse_bare?
     sh("git rev-parse --is-bare-repository 2> /dev/null", :result => /true/)

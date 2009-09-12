@@ -7,11 +7,11 @@ class GitFilter < DynPrompt::Filter::Base
   sub 'rb' do @rebasing ? ' - %BREBASING%b -' : '' end
 
   def names
-    @names.map {|n| n.sub(/refs\/((remotes\/)|(heads\/))/,'') }
+    @names && @names.map {|n| n.sub(/refs\/((remotes\/)|(heads\/))/,'') }
   end
 
   def other_names
-    names.select {|n| n != @branch }
+    (n=names) && n.select {|name| name != @branch }
   end
 
   def name
