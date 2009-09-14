@@ -26,18 +26,21 @@ module DynPrompt
           end
         end
       end
-      result = case result_type
-               when :result_type
-                 $?.success?
-               when :all
-                 res.empty? ? nil : res
-               when :one
-                 res.empty? ? nil : res.first
-               when Regexp
-                 result_type === res.first
-               else
-                 result_type === res
-               end
+      result = 
+        case result_type
+        when :result_type
+          $?.success?
+        when :all
+          res.empty? ? nil : res
+        when :one
+          res.empty? ? nil : res.first
+        when Regexp
+          result_type === res.first
+        when Proc
+          result_type.call(res)
+        else
+          result_type === res
+        end
       bloc&&result ? bloc.call(result) : result
     end
   end
