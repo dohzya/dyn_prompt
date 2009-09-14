@@ -3,7 +3,7 @@ low:
   RPROMPT: ""
 medium:
   PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
-  RPROMPT: "[$rvm()] %m %*"
+  RPROMPT: "${[}rvm(){] }%m %*"
 high:
   PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
-  RPROMPT: " %B%~%b) [$rvm()] %m %*"
+  RPROMPT: "(%B%~%b) ${[}rvm(){] }%m %*"
