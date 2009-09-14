@@ -11,32 +11,36 @@ class GitParser < DynPrompt::Parser::SCM
   def parse_status
     res = { :bare => bare? }
     return res if res[:bare]
-    sh("git status 2> /dev/null").each do |line|
-      (md = line.match(/On branch (.+)/)) && res[:branch] = md[1]
-      res[:commited]  = true if /Changes to be committed/ === line 
-      res[:changes]   = true if /Changed but not updated/ === line
-      res[:untracked] = true if /Untracked files/ === line
+    sh("git status 2> /dev/null") do |lines|
+      lines.each do |line|
+        (md = line.match(/On branch (.+)/)) && res[:branch] = md[1]
+        res[:commited]  = true if /Changes to be committed/ === line
+        res[:changes]   = true if /Changed but not updated/ === line
+        res[:untracked] = true if /Untracked files/ === line
+      end
+      res[:diff] = res[:commited] || res[:changes]
     end
-    res[:diff] = res[:commited] || res[:changes]
     res
   end
 
   def parse_branch
     status[:branch] || sh("git branch") do |branches|
-      branches.each do |line|
-        branch = line.sub(/[*]\s*([^\s]*)\s*/,'\1') if /^[*]/ === line
+      branch = branches.find{|line| /^[*]/ === line }
+      if branch
+        branch = branch.sub(/[*]\s*([^\s]*)\s*/,'\1')
+        branch.match(/[(]nobranch[)]/) ? nil : branch
+      else
+        nil
       end
-      branch.match(/[(]nobranch[)]/) ? nil : branch
     end
   end
 
   def parse_names
     sh("git show-ref --head --dereference 2> /dev/null") do |refs|
-      refs = refs.select do |r|
-        h,n = r.split
-        (h == head) && !(n =~ /HEAD/)
-      end
-      refs.map{|s| s.sub(/[^ ]* /,'')}
+      refs = refs.map do |ref|
+        h,n = ref.split(/\s+/)
+        if (h == head) && !(n =~ /HEAD/) then n else nil end
+      end.compact
     end
   end
 
@@ -53,7 +57,11 @@ class GitParser < DynPrompt::Parser::SCM
     status[:diff]
   end
   def parse_tags
-    sh("git show-ref --tags")
+    sh("git name-rev --tags HEAD 2> /dev/null") do |tags|
+      tags.map do |tag|
+        tag.sub(/.* tags\/([^^]*)(?:^.*)?/,'\1')
+      end
+    end
   end
   def parse_head
     sh("git rev-parse HEAD 2> /dev/null", :result => :one)
@@ -69,12 +77,5 @@ class GitParser < DynPrompt::Parser::SCM
   end
 
   # end of parsers
-
-  def tag
-    res = tags && tags.lines.find do |line|
-      line.sub( / .*$/, '' ) == head
-    end
-    res ? res.sub( /^.*\//, '' ).chomp : nil
-  end
 
 end # Git

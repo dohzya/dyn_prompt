@@ -2,29 +2,38 @@ class GitFilter < DynPrompt::Filter::Base
 
   sub 'nm', :name
   sub 'df' do |m| @diff ? m : nil end
-  sub 'tg' do @tag ? "%B#{@tag}%b" : nil end
+  sub 'tg', :tags
   sub 'fl', :flags
   sub 'rb' do @rebasing ? ' - %BREBASING%b -' : '' end
 
   def names
-    @names && @names.map {|n| n.sub(/refs\/((remotes\/)|(heads\/))/,'') }
+    @names ? @names.map {|name|
+      n = name.dup
+      n.sub!(/refs\/((remotes\/)|(heads\/)|(tags\/))/,'')
+      n.sub!(/\^[{][}]$/,'')
+      n
+    } : []
   end
 
-  def other_names
-    (n=names) && n.select {|name| name != @branch }
+  def branch
+    @branch && @inside_work_tree ? "%B#@branch%b" : @branch
   end
 
   def name
-    br = @branch
-    if br
-      br = "%B#{br}%b" if @inside_work_tree
-      br = "(#{br})" unless @branch
+    others = names.map{|n| n unless n == @branch }.compact
+    if @branch.nil? && others.empty?
+      @short_head
     else
-      br = @short_head
+      if others.empty?
+        branch
+      else
+        "#{branch}(#{others.join(',')})"
+      end
     end
-    br << "(#{other_names.join(',')})" unless other_names.blank?
-    br << "(t:#{tag})" if @tag
-    br
+  end
+
+  def tags
+    @tags ? @tags : []
   end
 
   def flags
