@@ -1,6 +1,7 @@
 class VimodeFilter < DynPrompt::Filter::Base
 
-  sub 'vm', :mode
+  # sub 'vm', :mode
+  sub 'vm', '%vimode%'
 
   def mode
     case @mode

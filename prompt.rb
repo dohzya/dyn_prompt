@@ -11,7 +11,11 @@ module DynPrompt
     def initialize(opts={})
       @file = opts[:file] || @@default_file
       @filters = opts[:filters] || Filter.filters
-      @yaml = YAML.load_file(@file)[verbosity]
+      yaml = YAML.load_file(@file)
+      @yaml = []
+      yaml['before'].each{|k,v| @yaml  << [k,v]} if yaml['before']
+      yaml[verbosity].each{|k,v| @yaml << [k,v]} if yaml[verbosity]
+      yaml['after'].each{|k,v| @yaml << [k,v]} if yaml['after']
     end
     
     # the verbosity if a simple way to quickly change prompts
@@ -30,8 +34,8 @@ module DynPrompt
     # - filter each line with all filters
     def generate
       @filters.inject(@yaml) do |yaml, filter|
-        yaml.inject(yaml.dup) do |new, (name, item)|
-          new[name] = filter.filter(item)
+        yaml.inject([]) do |new, (name, item)|
+          new << [name, filter.filter(item)]
           new
         end
       end

@@ -1,9 +1,12 @@
+after:
+  PROMPT: "$DYN_PROMPT"
+  RPTOMPT: "$DYN_RPROMPT"
 low:
-  PROMPT:  "$df(%B*%b){ }$nm()$rb(){ }$vm()%# "
-  RPROMPT: ""
+  DYN_PROMPT:  "$df(%B*%b){ }$nm()$rb(){ }$vm()%# "
+  DYN_RPROMPT: ""
 medium:
-  PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
-  RPROMPT: "${[}rvm(){] }%m %*"
+  DYN_PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
+  DYN_RPROMPT: "${[}rvm(){] }%m %*"
 high:
-  PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
-  RPROMPT: "(%B%~%b) ${[}rvm(){] }%m %*"
+  DYN_PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
+  DYN_RPROMPT: "(%B%~%b) ${[}rvm(){] }%m %*"

@@ -13,11 +13,11 @@ module DynPrompt
     end
     def generate(opts={})
       dir = opts[:dir] || ENV['PWD']
-      vars = {}
+      vars = nil
       Dir.chdir(dir) do
-        vars.merge!(@prompt.generate)
+        vars = @prompt.generate
         @filters.each do |filter|
-          vars.merge!(filter.class.filter_name => filter.env.vars)
+          vars << [filter.class.filter_name, filter.env.vars]
         end
       end
       vars
