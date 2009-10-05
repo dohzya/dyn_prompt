@@ -2,7 +2,7 @@ after:
   PROMPT: "$DYN_PROMPT"
   RPTOMPT: "$DYN_RPROMPT"
 low:
-  DYN_PROMPT:  "$df(%B*%b){ }$nm()$rb(){ }$vm()%# "
+  DYN_PROMPT:  "$df(%B*%b){ }$nm(){ }$rb(){ }$vm()%# "
   DYN_RPROMPT: ""
 medium:
   DYN_PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
