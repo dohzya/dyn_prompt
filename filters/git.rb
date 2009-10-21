@@ -7,12 +7,14 @@ class GitFilter < DynPrompt::Filter::Base
   sub 'rb' do @rebasing ? ' - %BREBASING%b -' : '' end
 
   def names
-    @names ? @names.map {|name|
+    res = @names ? @names.map {|name|
       n = name.dup
       n.sub!(/refs\/((remotes\/)|(heads\/)|(tags\/))/,'')
       n.sub!(/\^[{][}]$/,'')
       n
     } : []
+    max = ENV['prompt_git_refs_max'].to_i
+    (res.size > max) ? res[0..max]+['...'] : res
   end
 
   def branch
