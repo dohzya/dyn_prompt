@@ -13,8 +13,8 @@ class GitFilter < DynPrompt::Filter::Base
       n.sub!(/\^[{][}]$/,'')
       n
     } : []
-    max = ENV['prompt_git_refs_max'].to_i
-    (res.size > max) ? res[0..max]+['...'] : res
+    max_refs = ENV['prompt_git_refs_max'].to_i
+    (res.size > max_refs) ? res[0..max_refs]+['...'] : res
   end
 
   def branch
@@ -29,7 +29,10 @@ class GitFilter < DynPrompt::Filter::Base
       if others.empty?
         branch
       else
-        "#{branch}(#{others.join(',')})"
+        others = others.join(',')
+        max_chars = ENV['prompt_git_refs_max_chars'].to_i
+        others = (others.size > max_chars) ? "#{others[0..max_chars]}..." : others
+        "#{branch}(#{others})"
       end
     end
   end
