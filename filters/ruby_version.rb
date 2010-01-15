@@ -1,6 +1,6 @@
-class RVMFilter < DynPrompt::Filter::Base
+class RubyVersionFilter < DynPrompt::Filter::Base
 
-  sub 'rvm', :version
+  sub 'rv', :version
 
   def version
     @version.sub(/^ruby-/,'').sub(/-p\d*/,'')

@@ -6,7 +6,7 @@ low:
   DYN_RPROMPT: ""
 medium:
   DYN_PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
-  DYN_RPROMPT: "${[}rvm(){] }%m %*"
+  DYN_RPROMPT: "${[}rv(){] }%m %*"
 high:
   DYN_PROMPT:  "%1~${ }nm()$fl()$rb() $vm()%# "
-  DYN_RPROMPT: "(%B%~%b) ${[}rvm(){] }%m %*"
+  DYN_RPROMPT: "(%B%~%b) ${[}rv(){] }%m %*"
