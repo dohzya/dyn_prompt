@@ -6,7 +6,11 @@ class RubyVersionParser < DynPrompt::Parser::SCM
   # parsers
 
   def parse_version
-    RUBY_DESCRIPTION.sub(/\s*\(.*/, '')
+    if defined?(RUBY_DESCRIPTION)
+      RUBY_DESCRIPTION.sub(/\s*\(.*/, '')
+    else
+      "ruby 1.8.6"
+    end
   end
 
   def parse_gemset
