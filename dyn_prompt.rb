@@ -50,7 +50,7 @@ module DynPrompt
       when false
         first ? '""' : value
       when String,Symbol
-        value.to_s.inspect
+        value.to_s.inspect.gsub(/\\#/, '#')
       when Array
         res = "[%s]" % value.map{|e| json(e,false)}.join(',')
         first ? res.inspect : res
