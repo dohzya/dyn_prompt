@@ -2,7 +2,7 @@ module DynPrompt
   module Helpers
 
     # Execute a shell command and return the result or the standard output
-    # 
+    #
     # cmd[shell cmd]     => the command to execute
     # opts
     #   :return            => choose the type of return
@@ -11,8 +11,8 @@ module DynPrompt
     #     :one               => return the first line (or line)
     #     [no-symbol]        => return arg === line
     #   :select[hash,proc] => select what line to return
-    #   :filter[hash,proc] => filter line 
-    #   :test              => 
+    #   :filter[hash,proc] => filter line
+    #   :test              =>
     def sh(cmd, opts={}, &bloc)
       result_type = opts[:result] || :all
       select = opts[:select]
@@ -26,7 +26,7 @@ module DynPrompt
           end
         end
       end
-      result = 
+      result =
         case result_type
         when :result_type
           $?.success?

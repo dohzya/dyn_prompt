@@ -1,7 +1,8 @@
 class VimodeParser < DynPrompt::Parser::Base
-    def self.active?
-      ENV.has_key? 'VIMODE'
-    end
+
+  def self.active?
+    ENV.has_key? 'VIMODE'
+  end
 
   # parsers
 

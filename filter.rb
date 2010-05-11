@@ -56,7 +56,7 @@ module DynPrompt
       end
 
       # add a substitution variable
-      # 
+      #
       # pattern[string,regexp] => the pattern to substitute
       # value:                 => the value [replaced by &bloc if nil]
       #   [method]               => the method will be called

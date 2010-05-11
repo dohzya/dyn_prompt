@@ -17,10 +17,10 @@ module DynPrompt
       yaml[verbosity].each{|k,v| @yaml << [k,v]} if yaml[verbosity]
       yaml['after'].each{|k,v| @yaml << [k,v]} if yaml['after']
     end
-    
+
     # the verbosity if a simple way to quickly change prompts
     def verbosity
-      @verbosity ||= 
+      @verbosity ||=
         case ENV['prompt_verbosity']
         when '1', 'low'    then  'low'
         when '2', 'medium' then  'medium'
