@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require "#{File.dirname(__FILE__)}/dyn_prompt"
-
 def die(msg)
   $stderr.puts msg
   exit 1
@@ -23,10 +21,33 @@ while arg = args.shift
     print_usage
   when /-d|--dir/
     opts[:dir] = arg =~ /=/ ? arg.sub(/\s*=\s*/,'') : args.shift
+  when /-q|--quiet/
+    opts[:quiet] = true
   when /^-/
     die("unknown argument: #{arg}")
   end
 end
 
-env = DynPrompt::Env.new(opts)
-puts env.to_shell
+begin
+
+  require "#{File.dirname(__FILE__)}/dyn_prompt"
+  env = DynPrompt::Env.new(opts)
+  puts env.to_shell
+
+rescue => e
+
+  if opts[:quiet]
+    error = e.message+"\n"+e.backtrace.map{|b| "  #{b}"}.join("\n")
+    error.gsub!('`',"'")
+    puts <<-end_export
+    export DYN_PROMPT="%1~ %vimode%%# "
+    export PROMPT="$DYN_PROMPT"
+    export RPTOMPT="$DYN_RPROMPT"
+    export DYN_RPROMPT="[error] %m %*"
+    export DYN_ERROR=#{error.inspect}
+    end_export
+  else
+    raise
+  end
+
+end
