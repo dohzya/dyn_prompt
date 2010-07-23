@@ -11,7 +11,7 @@ class GitParser < DynPrompt::Parser::SCM
   def parse_status
     res = { :bare => bare? }
     return res if res[:bare]
-    sh("git status -uno 2> /dev/null") do |lines|
+    sh("git status 2> /dev/null") do |lines|
       lines.each do |line|
         (md = line.match(/On branch (.+)/)) && res[:branch] = md[1]
         res[:commited]  = true if /Changes to be committed/ === line
