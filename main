@@ -5,6 +5,19 @@ def die(msg)
   exit 1
 end
 
+def debug(*str)
+  puts(*str) if $opts[:debug]
+  $stdout.flush
+end
+
+def debug_place
+  debug caller[0]
+end
+
+def info(*str)
+  puts(*str) if $opts[:verbose]
+end
+
 def print_usage
   name = File.basename(__FILE__)
   $stderr.puts <<USAGE
@@ -14,29 +27,38 @@ USAGE
 end
 
 args = ARGV.dup
-opts = {}
+$opts = {
+  :quiet => $VERBOSE,
+  :debug => $DEBUG,
+}
 while arg = args.shift
   case arg
   when '-h','--help'
     print_usage
-  when /-d|--dir/
-    opts[:dir] = arg =~ /=/ ? arg.sub(/\s*=\s*/,'') : args.shift
-  when /-q|--quiet/
-    opts[:quiet] = true
+  when /^-d|--dir$/
+    $opts[:dir] = arg =~ /=/ ? arg.sub(/\s*=\s*/,'') : args.shift
+  when /^-q|--quiet$/
+    $opts[:debug] = false
+    $opts[:verbose] = false
+  when /^-d|--(no-)?debug$/
+    $opts[:debug] = !$1
+  when /^-v|--(no-)?verbose$/
+    $opts[:verbose] = !$1
   when /^-/
     die("unknown argument: #{arg}")
   end
 end
 
 begin
-
   require "#{File.dirname(__FILE__)}/dyn_prompt"
-  env = DynPrompt::Env.new(opts)
+  env = DynPrompt::Env.new($opts)
   puts env.to_shell
 
 rescue => e
 
-  if opts[:quiet]
+  if $opts[:debug]
+    raise
+  else
     error = e.message+"\n"+e.backtrace.map{|b| "  #{b}"}.join("\n")
     error.gsub!('`',"'")
     puts <<-end_export
@@ -46,8 +68,6 @@ rescue => e
     export DYN_RPROMPT="[error] %m %*"
     export DYN_ERROR=#{error.inspect}
     end_export
-  else
-    raise
   end
 
 end

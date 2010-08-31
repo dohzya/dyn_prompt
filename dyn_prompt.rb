@@ -27,6 +27,7 @@ module DynPrompt
     def initialize(opts={})
       generator = opts[:generator] || Generator.new(opts)
       @vars = generator.generate(opts).inject({}) do |vars, (name, value)|
+        name = name.sub(/.*::/, '')
         if value.is_a? Hash
           value.each do |n,v|
             vars["dyn_#{name.downcase}_#{n}"] = json(v)
