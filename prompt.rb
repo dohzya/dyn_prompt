@@ -22,6 +22,7 @@ module DynPrompt
     def verbosity
       @verbosity ||=
         case ENV['prompt_verbosity']
+        when '0', 'very_low' then 'very_low'
         when '1', 'low'    then  'low'
         when '2', 'medium' then  'medium'
         when '3', 'high'   then  'high'

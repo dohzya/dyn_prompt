@@ -1,6 +1,9 @@
 after:
   PROMPT: "$DYN_PROMPT"
   RPTOMPT: "$DYN_RPROMPT"
+very_low:
+  DYN_PROMPT:  "%# "
+  DYN_RPROMPT: ""
 low:
   DYN_PROMPT:  "$df(%B*%b){ }$nm(){ }$rb(){ }$vm()%# "
   DYN_RPROMPT: ""
