@@ -46,7 +46,7 @@ module DynPrompt::Parser
     end
 
     def parse_rebasing?
-      File.exist?(dir/'rebase-apply')
+      !Dir[dir/'rebase-*'].empty?
     end
     def parse_dir
       sh("git rev-parse --git-dir 2> /dev/null", :result => :one){|dir| Pathname.new(dir) }
