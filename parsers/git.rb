@@ -16,7 +16,7 @@ module DynPrompt::Parser
         lines.each do |line|
           (md = line.match(/On branch (.+)/)) && res[:branch] = md[1]
           res[:commited]  = true if /Changes to be committed/ === line
-          res[:changes]   = true if /Changed but not updated/ === line
+          res[:changes]   = true if /Changed but not updated|Changes not staged for commit/ === line
           res[:untracked] = true if /Untracked files/ === line
         end
         res[:diff] = res[:commited] || res[:changes]
