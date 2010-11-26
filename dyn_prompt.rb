@@ -11,8 +11,7 @@ module DynPrompt
       @filters = opts[:filters] || Filter.filters
       @prompt  = opts[:prompt]  || Prompt.new(opts)
     end
-    def generate(opts={})
-      dir = opts[:dir] || ENV['PWD']
+    def generate(dir, opts={})
       vars = nil
       Dir.chdir(dir) do
         vars = @prompt.generate
@@ -26,7 +25,11 @@ module DynPrompt
   class Env
     def initialize(opts={})
       generator = opts[:generator] || Generator.new(opts)
-      @vars = generator.generate(opts).inject({}) do |vars, (name, value)|
+      dir = opts[:dir] || ENV['PWD']
+      default = {
+        :DYN_PATH => dir,
+      }
+      @vars = generator.generate(dir, opts).inject(default) do |vars, (name, value)|
         name = name.sub(/.*::/, '')
         if value.is_a? Hash
           value.each do |n,v|
